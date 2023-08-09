@@ -7,7 +7,7 @@ use App\Models\Karyawan;
 use CodeIgniter\Router\Router;
 use Myth\Auth\Config\Auth as AuthConfig;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
-
+use \CodeIgniter\Shield\Controllers;
 // Create a new instance of our RouteCollection class.
 $routes = Services::routes();
 
@@ -35,8 +35,11 @@ $routes->set404Override();
 
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
-$routes->get('/', 'Home::index');
+$routes->get('/', 'DashboardController::index');
+// $routes->get('login', 'auth\LoginController::loginView');
 service('auth')->routes($routes);
+// service('auth')->routes($routes, ['except' => ['login']]);
+// $routes->get('/', '\CodeIgniter\Shield\Controllers\LoginController::loginView', ['as' => 'login']);
 $routes->group('/dashboard', static function ($routes) {
     //route barang
     $routes->get('/', 'DashboardController::index', ['as' => 'dashboard']);
@@ -77,7 +80,7 @@ $routes->group('/dashboard', static function ($routes) {
     });
     //karywan
 
-    $routes->group('karyawan', static function ($routes) {
+    $routes->group('karyawan', ['filter' => 'group:admin'], static function ($routes) {
         $routes->get('', 'KaryawanController::index', ['as' => 'karyawan']);
         $routes->get('add', 'KaryawanController::add', ['as' => 'add_karyawan']);
         $routes->post('add', 'KaryawanController::save', ['as' => 'save_karyawan']);
